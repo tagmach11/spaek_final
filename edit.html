@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>AX2 - 강의 번역 편집</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="edit.css">
+</head>
+<body>
+    <!-- 모바일 메뉴 버튼 -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" style="display: none;">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 사이드바 오버레이 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- 상단 네비게이션 -->
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <div class="logo" onclick="location.href='index.html'">AX2</div>
+            </div>
+            <div class="nav-right">
+                <div class="plan-info">
+                    <span class="highlight">Free</span> <span id="remaining-time">0분 남음</span>
+                </div>
+                <a href="login.html" class="login-btn">로그인</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 왼쪽 사이드바 -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">AX2</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-item" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>홈</span>
+                </a>
+                <a href="mypage.html" class="sidebar-item active" data-page="mypage">
+                    <i class="fas fa-user"></i>
+                    <span>마이페이지</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content">
+        <!-- 좌측 편집 영역 -->
+        <div class="edit-section">
+            <div class="video-title-display" id="video-title-display">
+                <div class="title-wrapper">
+                    <h2 class="video-title-text" id="video-title-text">강의 제목</h2>
+                    <button class="edit-title-btn" id="edit-title-btn" title="제목 편집">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="edit-header">
+                <div class="language-tabs">
+                    <div class="lang-tab active" data-lang="ko">
+                        <span class="lang-flag">🇰🇷</span>
+                        <span>Korean</span>
+                    </div>
+                    <div class="lang-tab" data-lang="en">
+                        <span class="lang-flag">🇺🇸</span>
+                        <span>English</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="transcription-list" id="transcription-list">
+                <!-- 텍스트 세그먼트들이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+
+        <!-- 우측 비디오 영역 -->
+        <div class="video-section">
+            <div class="video-tabs">
+                <button class="video-tab active" data-tab="original">원본</button>
+                <button class="video-tab" data-tab="translation">번역</button>
+            </div>
+
+            <div class="warning-banner">
+                편집한 내용은 자동으로 반영되지 않습니다. 완료 후 '변경사항 적용하기'를 눌러 적용해 주세요.
+            </div>
+
+            <div class="video-container">
+                <!-- 드래그 앤 드롭 영역 (비디오가 없을 때 표시) -->
+                <div class="video-drop-zone" id="video-drop-zone" style="display: none;">
+                    <input type="file" id="video-file-input" class="hidden" accept="video/*">
+                    <div class="drop-zone-content">
+                        <div class="drop-zone-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3 class="drop-zone-title">영상을 드래그하거나 클릭하여 업로드</h3>
+                        <p class="drop-zone-subtitle">MP4, MOV, AVI, WEBM (최대 2GB)</p>
+                    </div>
+                </div>
+                
+                <!-- 비디오 플레이어 (비디오가 있을 때 표시) -->
+                <div class="video-player-wrapper" id="video-player-wrapper" style="display: flex;">
+                    <video class="video-player" id="video-player" preload="metadata" controls>
+                        <source src="" type="video/mp4">
+                    </video>
+                    <div class="subtitle-overlay" id="subtitle-overlay">
+                        <div class="subtitle-text" id="subtitle-text"></div>
+                    </div>
+                </div>
+                
+                <!-- 비디오 로드 실패 placeholder -->
+                <div class="video-placeholder" id="video-placeholder" style="display: none;">
+                    <i class="fas fa-video-slash"></i>
+                    <div>비디오를 불러올 수 없습니다</div>
+                    <div style="font-size: 14px; color: #999999; margin-top: 8px;">비디오 파일이 없거나 로드할 수 없습니다.</div>
+                    <button class="retry-btn" onclick="document.getElementById('video-file-input').click()" style="margin-top: 16px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        다시 시도
+                    </button>
+                </div>
+            </div>
+
+            <div class="video-controls">
+                <div class="controls-row">
+                    <button class="play-btn" id="play-btn">▶</button>
+                    <span class="time-display" id="time-display">0:00:00</span>
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="control-icons">
+                        <button class="control-icon" id="caption-btn" title="자막">CC</button>
+                        <button class="control-icon" id="volume-btn" title="볼륨">🔊</button>
+                        <button class="control-icon" id="speed-btn" title="재생 속도">1x</button>
+                        <button class="control-icon" id="fullscreen-btn" title="전체화면">⛶</button>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn apply-btn-inline" onclick="applyChanges()">
+                        변경사항 적용하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 제목 편집 모달 -->
+    <div class="title-edit-modal" id="title-edit-modal" style="display: none;">
+        <div class="modal-backdrop" id="title-modal-backdrop"></div>
+        <div class="title-edit-modal-content">
+            <div class="title-edit-modal-header">
+                <h3>제목 편집</h3>
+                <button class="title-edit-modal-close" id="title-edit-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="title-edit-modal-body">
+                <input type="text" class="title-edit-input" id="title-edit-input" placeholder="제목을 입력하세요" maxlength="100">
+                <div class="title-edit-char-count">
+                    <span id="title-char-count">0</span> / 100
+                </div>
+            </div>
+            <div class="title-edit-modal-footer">
+                <button class="title-edit-cancel-btn" id="title-edit-cancel-btn">취소</button>
+                <button class="title-edit-save-btn" id="title-edit-save-btn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth-state.js" defer></script>
+    <script src="edit.js" defer></script>
+</body>
+</html>
+
