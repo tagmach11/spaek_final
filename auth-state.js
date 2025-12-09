@@ -1,0 +1,69 @@
+// 로그인 상태 관리 공통 스크립트
+(function() {
+    'use strict';
+
+    // 로그인 상태 확인
+    function isLoggedIn() {
+        return localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    // 현재 사용자 정보 가져오기
+    function getCurrentUser() {
+        try {
+            const userData = localStorage.getItem('currentUser');
+            return userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('사용자 정보 가져오기 오류:', error);
+            return null;
+        }
+    }
+
+    // 로그인 버튼 업데이트
+    function updateLoginButton() {
+        const loginButtons = document.querySelectorAll('.login-btn');
+        
+        loginButtons.forEach(btn => {
+            if (isLoggedIn()) {
+                // 로그인 상태: 로그아웃 버튼으로 변경
+                btn.textContent = '로그아웃';
+                btn.href = '#';
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    handleLogout();
+                };
+                btn.style.cursor = 'pointer';
+            } else {
+                // 로그아웃 상태: 로그인 버튼으로 유지
+                btn.textContent = '로그인';
+                btn.href = 'login.html';
+                btn.onclick = null;
+            }
+        });
+    }
+
+    // 로그아웃 처리
+    function handleLogout() {
+        if (confirm('로그아웃 하시겠습니까?')) {
+            // 로그인 상태 제거
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            
+            // 로그인 페이지로 리디렉션
+            window.location.href = 'login.html';
+        }
+    }
+
+    // 페이지 로드 시 로그인 버튼 업데이트
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateLoginButton);
+    } else {
+        updateLoginButton();
+    }
+
+    // 전역 함수로 등록
+    window.isLoggedIn = isLoggedIn;
+    window.getCurrentUser = getCurrentUser;
+    window.handleLogout = handleLogout;
+    window.updateLoginButton = updateLoginButton;
+})();
+
