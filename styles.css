@@ -163,11 +163,22 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
 }
 
 .logo:hover {
-    color: #2196F3;
     transform: scale(1.05);
+}
+
+.logo:hover .logo-img {
+    opacity: 0.9;
 }
 
 .service-tabs {
@@ -186,7 +197,7 @@ body {
     border: none;
     background: transparent;
     color: #666666;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -339,9 +350,9 @@ body {
 .sidebar {
     position: fixed;
     left: 0;
-    top: 0;
+    top: 70px;
     width: 280px;
-    height: 100vh;
+    height: calc(100vh - 70px);
     z-index: 100;
     overflow-y: auto;
 }
@@ -349,7 +360,7 @@ body {
 .sidebar-content {
     background: var(--glass-bg);
     backdrop-filter: blur(30px);
-    padding: 25px;
+    padding: 20px 25px;
     box-shadow: 0 10px 40px var(--shadow-soft);
     border-right: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
@@ -368,6 +379,15 @@ body {
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-logo-img {
+    height: 24px;
+    width: auto;
+    object-fit: contain;
 }
 
 .sidebar-nav {
@@ -1850,7 +1870,7 @@ body {
     
     .service-tab {
         padding: 8px 14px;
-        font-size: 11px;
+        font-size: 14px;
     }
     
     .plan-info {
@@ -2011,6 +2031,14 @@ body {
         font-size: 20px;
     }
     
+    .logo-img {
+        height: 24px;
+    }
+    
+    .sidebar-logo-img {
+        height: 20px;
+    }
+    
     .nav-left {
         gap: 10px;
         flex-wrap: wrap;
@@ -2024,7 +2052,7 @@ body {
     
     .service-tab {
         padding: 6px 10px;
-        font-size: 10px;
+        font-size: 12px;
         flex: 1;
         min-width: 120px;
     }
@@ -2125,7 +2153,7 @@ body {
     width: 100px;
     height: 100px;
     margin: 0 auto 30px;
-    background: linear-gradient(135deg, var(--blue), var(--purple));
+    background: var(--blue);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2154,7 +2182,7 @@ body {
 
 .live-lecture-btn {
     padding: 16px 40px;
-    background: linear-gradient(135deg, var(--blue), var(--purple));
+    background: var(--blue);
     color: white;
     border: none;
     border-radius: 12px;
@@ -2204,7 +2232,7 @@ body {
     width: 70px;
     height: 70px;
     margin: 0 auto 20px;
-    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(156, 39, 176, 0.1));
+    background: rgba(33, 150, 243, 0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
