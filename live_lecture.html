@@ -163,7 +163,20 @@
 
         // 강의 시작 함수
         function startLiveLecture() {
-            alert('실시간 강의 기능은 곧 제공될 예정입니다.');
+            // 실시간 강의실 생성
+            const lectureRoom = {
+                id: 'lecture_' + Date.now(),
+                createdAt: new Date().toISOString(),
+                status: 'ready',
+                title: '새로운 강의',
+                participants: []
+            };
+            
+            // 로컬 스토리지에 강의실 정보 저장
+            localStorage.setItem('ax2_current_lecture', JSON.stringify(lectureRoom));
+            
+            // 실시간 강의실로 이동
+            window.location.href = 'poly_talk.html';
         }
     </script>
 </body>

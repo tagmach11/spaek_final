@@ -2,474 +2,573 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />
-    <title>PolyTalk - LX2AI</title>
-    <link rel="stylesheet" href="polytalk.css">
-    <script src="polytalk.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>실시간 강의실 - AX2</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .main-container {
+            padding: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .lecture-room-container {
+            width: 100%;
+            height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px 20px 20px;
+            gap: 20px;
+        }
+
+        .lecture-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: white;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .stop-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .stop-btn:hover {
+            background: #d32f2f;
+        }
+
+        .language-selector-btn {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-dark);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .language-selector-btn:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .subtitle-toggle-btn {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-dark);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle-toggle-btn.active {
+            background: var(--blue);
+            color: white;
+        }
+
+        .main-content-area {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        .video-area {
+            background: #000;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .subtitle-overlay {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            max-width: 80%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .subtitle-overlay.show {
+            display: block;
+        }
+
+        .settings-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+
+        .language-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .language-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .language-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .language-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .language-item label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+
+        .timer-display {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content-area {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="lx_app_wrap">
-        <div class="lx_app_header sticky">
-            <!-- 로고, code, 타이머 -->
-            <div class="brand">
-                <h3 class="logo"><a href="poly_talk.html" style="text-decoration: none; display: inline-block;">AI Translator 강의</a></h3>
-                <button class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary qa-toggle-btn-wrapper qa-btn-mobile" type="button" id="qaToggleBtnMobile">
-                    <span class="k-button-text">Q&A</span>
-                    <span class="qa-notification-badge" id="qaNotificationBadgeMobile" style="display: none;">0</span>
-                </button>
-            </div>
-            
-            <div class="menu">
-                <button class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary qa-toggle-btn-wrapper qa-btn-desktop" type="button" id="qaToggleBtn">
-                    <span class="k-button-text">Q&A</span>
-                    <span class="qa-notification-badge" id="qaNotificationBadge" style="display: none;">0</span>
-                </button>
-                <div class="room-code-display-inline">
-                    <span class="room-code-label">방 번호:</span>
-                    <span class="room-code-text" id="roomCodeDisplayHeader">-</span>
-                </div>
-                <span class="subject-select-text" id="subjectSelectBtn">
-                    <span id="subjectSelectText">과목 선택</span>
-                </span>
-                <div class="timer">
-                    <span class="k-icon k-font-icon k-i-clock"></span>
-                    <div class="num" id="timer">00:00:00</div>
-                </div>
-            </div>
-            <!-- //로고, code, 타이머 -->
-        </div>
-
-        <!-- 실시간 자막 서비스 -->
-        <div class="lx_app_realtime_caption">
-            <div class="app_header">
-                <!-- 왼쪽: 숨겨진 언어 태그 버튼 영역 -->
-                <div class="app_header-left">
-                    <div class="hidden-languages-bar" id="hiddenLanguagesBar"></div>
-                </div>
-                <!-- 오른쪽: 컨트롤 버튼들 -->
-                <div class="app_header-right">
-                    <div class="lang">
-                        <select id="speakerLanguageCd" name="speakerLanguageCd" style="display: none;">
-                            <option value="ko" data-code="ko" selected>한국어</option>
-                            <option value="null" data-code="null">전체</option>
-                            <option value="en" data-code="en">영어</option>
-                            <option value="zh" data-code="zh">중국어</option>
-                            <option value="ja" data-code="ja">일본어</option>
-                            <option value="es" data-code="es">스페인어</option>
-                        </select>
-                    <button class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-secondary" type="button" onclick="showLanguagePopup()">
-                        <span class="k-button-text">언어 설정</span>
-                    </button>
-                        <form id="form-language-update" style="display: none;">
-                            <input type="hidden" name="voiceTranslationSeq" value="">
-                            <input type="checkbox" name="languageCd" value="LANGUAGE::KOREAN" id="languageCd_0">
-                            <input type="checkbox" name="languageCd" value="LANGUAGE::ENGLISH" id="languageCd_1" checked>
-                            <input type="checkbox" name="languageCd" value="LANGUAGE::CHINESE" id="languageCd_2">
-                            <input type="checkbox" name="languageCd" value="LANGUAGE::JAPANESE" id="languageCd_3">
-                        </form>
-                    </div>
-                    <button class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary" type="button" id="startBtn" disabled>
-                        <span class="k-button-text">강의 시작</span>
-                    </button>
-                    <button class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary " type="button" id="stopBtn" disabled>
-                        <span class="k-button-text">강의 종료</span>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- 재생 바 -->
-            <div class="playback-bar" id="playbackBar" style="display: none;">
-                <div class="playback-controls">
-                    <button class="playback-btn" id="playPauseBtn">
-                        <span class="playback-icon" id="playPauseIcon">⏸</span>
-                    </button>
-                    <div class="playback-time">
-                        <span id="currentTime">00:00</span>
-                        <span class="time-separator">/</span>
-                        <span id="totalTime">00:00</span>
-                    </div>
-                </div>
-                <div class="playback-seek">
-                    <input type="range" class="seek-slider" id="seekSlider" min="0" max="100" value="0">
-                    <div class="seek-progress" id="seekProgress"></div>
-                </div>
-            </div>
-            
-            <!-- 자막 -->
-            <div class="cp_trans" id="cp_trans">
-                <!-- 언어 패널들이 동적으로 생성됩니다 -->
-            </div>
-            <!-- //자막 -->
-            
-            <!-- Q&A 오버레이 -->
-            <div class="qa-overlay" id="qaOverlay"></div>
-            
-            <!-- Q&A 슬라이드 패널 -->
-            <div class="qa-slide-panel" id="qaSlidePanel">
-                <div class="qa-panel-header">
-                    <h3 class="qa-panel-title">Q&A </h3>
-                    <div class="qa-panel-header-buttons">
-                        <button class="qa-mic-toggle-btn" id="qaMicToggleBtn" title="마이크 넘기기">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                            <span class="qa-mic-toggle-text">마이크 넘기기</span>
-                        </button>
-                        <button class="qa-panel-close-btn" id="qaPanelCloseBtn">&times;</button>
-                    </div>
-                </div>
-                <div class="qa-panel-content">
-                    <div class="qa-chat-messages" id="qaChatMessages">
-                        <!-- 채팅 메시지들이 여기에 동적으로 추가됩니다 -->
-                    </div>
-                </div>
-                <div class="qa-panel-footer">
-                    <div class="qa-input-container">
-                        <input type="text" class="qa-input" id="qaInput" placeholder="답변을 입력하세요...">
-                        <button class="qa-voice-btn" id="qaVoiceBtn">
-                            <img src="음성버튼.png" alt="음성 버튼" class="qa-voice-btn-icon">
-                        </button>
-                        <button class="qa-send-btn" id="qaSendBtn">전송</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- //실시간 자막 서비스 -->
-        
-        <!-- 번역 기록 섹션 -->
-        <div class="translation-history-section" id="translationHistorySection" style="display: none;">
-            <div class="history-container">
-                <div class="history-header">
-                    <h2 class="history-title">번역 기록</h2>
-                    <button class="history-close-btn" onclick="closeHistorySection()">×</button>
-                </div>
-                <div class="subject-filter">
-                    <label for="subjectFilter">과목 선택:</label>
-                    <select id="subjectFilter">
-                        <option value="all">전체</option>
-                    </select>
-                </div>
-                <div class="history-list" id="historyList">
-                    <!-- 번역 기록이 여기에 동적으로 추가됩니다 -->
-                </div>
-            </div>
-        </div>
+    <!-- 모바일 메뉴 버튼 -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" style="display: none;">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 사이드바 오버레이 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- 배경 효과 -->
+    <div class="background-effects">
+        <div class="gradient-cloud cloud-1"></div>
+        <div class="gradient-cloud cloud-2"></div>
+        <div class="gradient-cloud cloud-3"></div>
+        <canvas id="particles-canvas"></canvas>
+        <canvas id="confetti-canvas"></canvas>
+        <div class="reflection-light"></div>
     </div>
 
-    <!-- 과목 선택 모달 -->
-    <div class="modal-overlay" id="subjectModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">과목 선택</h2>
-                <button class="modal-close" id="closeModal">&times;</button>
+    <!-- 상단 네비게이션 -->
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <div class="logo" onclick="location.href='index.html'">
+                    <img src="AX2_logo.png" alt="AX2" class="logo-img">
+                </div>
+                <div class="service-tabs">
+                    <button class="service-tab" onclick="location.href='index.html'">
+                        자동 번역/다국어 자막
+                    </button>
+                    <button class="service-tab active" onclick="location.href='live_lecture.html'">
+                        실시간 강의
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <!-- 과목 선택 화면 -->
-                <div class="modal-step" id="subjectStep">
-                    <!-- 교과/비교과 탭 -->
-                    <div class="subject-tabs">
-                        <button class="subject-tab active" data-tab="교과" id="tab교과">교과</button>
-                        <button class="subject-tab" data-tab="비교과" id="tab비교과">비교과</button>
-                    </div>
-                    <p class="modal-description">강의 중 사용할 과목을 선택해주세요.</p>
-                    <div class="subject-list" id="subjectList">
-                        <!-- 과목 목록이 여기에 동적으로 추가됩니다 -->
-                    </div>
-                    <div class="modal-step-footer" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
-                        <button class="language-popup-btn language-popup-btn-cancel" onclick="hideSubjectModal()">취소</button>
-                        <button class="language-popup-btn language-popup-btn-save" id="subjectSaveBtn" onclick="saveSubjectOnly()">저장</button>
+            <div class="nav-right">
+                <div class="plan-info">
+                    <span class="highlight">Free</span> <span id="remaining-time">0분 남음</span>
+                </div>
+                <a href="login.html" class="login-btn">로그인</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-container">
+        <div class="lecture-room-container">
+            <!-- 컨트롤 바 -->
+            <div class="lecture-controls">
+                <div class="control-group">
+                    <button class="control-btn start-btn" id="startBtn">
+                        <i class="fas fa-play"></i>
+                        강의 시작
+                    </button>
+                    <button class="control-btn stop-btn" id="stopBtn" style="display: none;">
+                        <i class="fas fa-stop"></i>
+                        강의 종료
+                    </button>
+                    <div class="timer-display" id="timerDisplay">00:00:00</div>
+                </div>
+                <div class="control-group">
+                    <button class="control-btn language-selector-btn" id="languageBtn">
+                        <i class="fas fa-globe"></i>
+                        언어 설정
+                    </button>
+                    <button class="control-btn subtitle-toggle-btn" id="subtitleToggleBtn">
+                        <i class="fas fa-closed-captioning"></i>
+                        자막 ON
+                    </button>
+                </div>
+            </div>
+
+            <!-- 메인 콘텐츠 영역 -->
+            <div class="main-content-area">
+                <!-- 비디오 영역 -->
+                <div class="video-area">
+                    <video class="video-preview" id="videoPreview" autoplay muted playsinline></video>
+                    <div class="subtitle-overlay" id="subtitleOverlay">
+                        <div id="subtitleText"></div>
                     </div>
                 </div>
-                
-                <!-- 언어 설정 화면 -->
-                <div class="modal-step" id="languageStep" style="display: none;">
-                    <div class="language-popup-header">
-                        <div class="language-icon-circle">
-                            <span class="language-icon-emoji">🌐</span>
-                        </div>
-                        <h3 class="language-popup-title">언어 설정</h3>
-                        <p class="language-popup-subtitle">원하는 언어를 선택하세요</p>
-                    </div>
-                    
-                    <div class="language-options">
-                        <!-- Input Language Section -->
-                        <div class="language-section">
-                            <label for="subjectModal_inputLanguageCd" class="language-section-label">입력 언어</label>
-                            <div class="language-input-wrapper">
-                                <select id="subjectModal_inputLanguageCd" name="subjectModal_inputLanguageCd" class="language-popup-select">
-                                    <option value="ko" data-code="ko" selected>한국어</option>
-                                    <option value="en" data-code="en">영어</option>
-                                    <option value="zh" data-code="zh">중국어</option>
-                                    <option value="ja" data-code="ja">일본어</option>
-                                </select>
+
+                <!-- 설정 패널 -->
+                <div class="settings-panel">
+                    <div class="settings-section">
+                        <div class="settings-title">번역 언어 선택</div>
+                        <div class="language-list" id="languageList">
+                            <div class="language-item">
+                                <input type="checkbox" id="lang-ko" value="ko" checked>
+                                <label for="lang-ko">한국어</label>
+                            </div>
+                            <div class="language-item">
+                                <input type="checkbox" id="lang-en" value="en" checked>
+                                <label for="lang-en">English</label>
+                            </div>
+                            <div class="language-item">
+                                <input type="checkbox" id="lang-ja" value="ja">
+                                <label for="lang-ja">日本語</label>
+                            </div>
+                            <div class="language-item">
+                                <input type="checkbox" id="lang-zh" value="zh">
+                                <label for="lang-zh">中文</label>
+                            </div>
+                            <div class="language-item">
+                                <input type="checkbox" id="lang-es" value="es">
+                                <label for="lang-es">Español</label>
+                            </div>
+                            <div class="language-item">
+                                <input type="checkbox" id="lang-fr" value="fr">
+                                <label for="lang-fr">Français</label>
                             </div>
                         </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth-state.js" defer></script>
+    <script src="script.js" defer></script>
+    <script>
+        // 실시간 강의실 기능
+        let isRecording = false;
+        let startTime = null;
+        let timerInterval = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let recognition = null;
+        let selectedLanguages = ['ko', 'en'];
+        let subtitleVisible = true;
+
+        // Web Speech API 지원 확인
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        // 타이머 업데이트
+        function updateTimer() {
+            if (!startTime) return;
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const hours = Math.floor(elapsed / 3600);
+            const minutes = Math.floor((elapsed % 3600) / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // 강의 시작
+        async function startLecture() {
+            try {
+                // 카메라와 마이크 권한 요청
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+
+                // 비디오 미리보기
+                const videoPreview = document.getElementById('videoPreview');
+                videoPreview.srcObject = stream;
+
+                // 녹화 시작
+                mediaRecorder = new MediaRecorder(stream);
+                recordedChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    saveRecording();
+                };
+
+                mediaRecorder.start();
+
+                // 음성 인식 시작
+                if (SpeechRecognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+                    recognition.lang = 'ko-KR';
+
+                    recognition.onresult = (event) => {
+                        let interimTranscript = '';
+                        let finalTranscript = '';
+
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            const transcript = event.results[i][0].transcript;
+                            if (event.results[i].isFinal) {
+                                finalTranscript += transcript + ' ';
+                                // 여기서 번역 API 호출 가능
+                                translateAndDisplay(transcript);
+                            } else {
+                                interimTranscript += transcript;
+                            }
+                        }
+
+                        if (interimTranscript) {
+                            displaySubtitle(interimTranscript, 'ko');
+                        }
+                    };
+
+                    recognition.onerror = (event) => {
+                        console.error('음성 인식 오류:', event.error);
+                    };
+
+                    recognition.start();
+                }
+
+                // 타이머 시작
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 1000);
+
+                // UI 업데이트
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('stopBtn').style.display = 'flex';
+                isRecording = true;
+
+            } catch (error) {
+                console.error('강의 시작 오류:', error);
+                alert('카메라와 마이크 권한이 필요합니다.');
+            }
+        }
+
+        // 강의 종료
+        function stopLecture() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+            }
+
+            if (recognition) {
+                recognition.stop();
+            }
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            // 스트림 정리
+            const videoPreview = document.getElementById('videoPreview');
+            if (videoPreview.srcObject) {
+                videoPreview.srcObject.getTracks().forEach(track => track.stop());
+                videoPreview.srcObject = null;
+            }
+
+            // UI 업데이트
+            document.getElementById('startBtn').style.display = 'flex';
+            document.getElementById('stopBtn').style.display = 'none';
+            isRecording = false;
+            startTime = null;
+        }
+
+        // 녹화 저장
+        function saveRecording() {
+            if (recordedChunks.length === 0) return;
+
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `강의_${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
+            a.click();
+
+            // 로컬 스토리지에 저장
+            const videoData = {
+                id: Date.now().toString(),
+                title: `강의_${new Date().toLocaleString()}`,
+                date: new Date().toISOString(),
+                url: url,
+                duration: Math.floor((Date.now() - startTime) / 1000)
+            };
+
+            const videos = JSON.parse(localStorage.getItem('ax2_live_lectures') || '[]');
+            videos.unshift(videoData);
+            localStorage.setItem('ax2_live_lectures', JSON.stringify(videos));
+
+            alert('강의가 저장되었습니다. 마이페이지에서 확인할 수 있습니다.');
+        }
+
+        // 자막 표시
+        function displaySubtitle(text, lang) {
+            if (!subtitleVisible) return;
+
+            const subtitleOverlay = document.getElementById('subtitleOverlay');
+            const subtitleText = document.getElementById('subtitleText');
+            
+            subtitleText.textContent = text;
+            subtitleOverlay.classList.add('show');
+        }
+
+        // 번역 및 표시 (시뮬레이션)
+        function translateAndDisplay(text) {
+            // 실제로는 번역 API를 호출해야 함
+            selectedLanguages.forEach(lang => {
+                if (lang !== 'ko') {
+                    // 시뮬레이션: 간단한 번역 표시
+                    setTimeout(() => {
+                        displaySubtitle(`[${lang}] ${text}`, lang);
+                    }, 100);
+                }
+            });
+        }
+
+
+        // 이벤트 리스너
+        document.getElementById('startBtn').addEventListener('click', startLecture);
+        document.getElementById('stopBtn').addEventListener('click', stopLecture);
+
+        document.getElementById('subtitleToggleBtn').addEventListener('click', function() {
+            subtitleVisible = !subtitleVisible;
+            const subtitleOverlay = document.getElementById('subtitleOverlay');
+            if (subtitleVisible) {
+                subtitleOverlay.classList.add('show');
+                this.innerHTML = '<i class="fas fa-closed-captioning"></i> 자막 ON';
+                this.classList.add('active');
+            } else {
+                subtitleOverlay.classList.remove('show');
+                this.innerHTML = '<i class="fas fa-closed-captioning"></i> 자막 OFF';
+                this.classList.remove('active');
+            }
+        });
+
+        // 언어 선택 업데이트
+        document.querySelectorAll('#languageList input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                selectedLanguages = Array.from(document.querySelectorAll('#languageList input[type="checkbox"]:checked'))
+                    .map(cb => cb.value);
+            });
+        });
+
+
+        // 현재 페이지에 따라 활성 탭 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.service-tab');
+            const currentPath = window.location.pathname;
+            
+            tabs.forEach(tab => {
+                const href = tab.getAttribute('onclick');
+                if (href) {
+                    const url = href.match(/location\.href='([^']+)'/)?.[1];
+                    if (url) {
+                        const tabPath = url.split('/').pop() || 'index.html';
+                        const currentPage = currentPath.split('/').pop() || 'index.html';
                         
-                        <!-- Output Languages Section -->
-                        <div class="language-section">
-                            <label class="language-section-label">번역 언어</label>
-                            <div class="output-languages-grid">
-                                <label for="subjectModal_speakerLanguageCd_1" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::ENGLISH" id="subjectModal_speakerLanguageCd_1" class="language-checkbox" checked>
-                                    <span class="language-option-text">English(영어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_2" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::CHINESE" id="subjectModal_speakerLanguageCd_2" class="language-checkbox">
-                                    <span class="language-option-text">中文(중국어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_3" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::JAPANESE" id="subjectModal_speakerLanguageCd_3" class="language-checkbox">
-                                    <span class="language-option-text">日本語(일본어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_4" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::VIETNAMESE" id="subjectModal_speakerLanguageCd_4" class="language-checkbox">
-                                    <span class="language-option-text">Tiếng Việt(베트남어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_5" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::UZBEK" id="subjectModal_speakerLanguageCd_5" class="language-checkbox">
-                                    <span class="language-option-text">O'zbek(우즈베크어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_6" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::MONGOLIAN" id="subjectModal_speakerLanguageCd_6" class="language-checkbox">
-                                    <span class="language-option-text">Монгол(몽골어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_7" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::INDONESIAN" id="subjectModal_speakerLanguageCd_7" class="language-checkbox">
-                                    <span class="language-option-text">Bahasa Indonesia(인도네시아어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_8" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::NEPALI" id="subjectModal_speakerLanguageCd_8" class="language-checkbox">
-                                    <span class="language-option-text">नेपाली(네팔어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_9" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::RUSSIAN" id="subjectModal_speakerLanguageCd_9" class="language-checkbox">
-                                    <span class="language-option-text">Русский(러시아어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_10" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::THAI" id="subjectModal_speakerLanguageCd_10" class="language-checkbox">
-                                    <span class="language-option-text">ไทย(태국어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_11" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::KHMER" id="subjectModal_speakerLanguageCd_11" class="language-checkbox">
-                                    <span class="language-option-text">ភាសាខ្មែរ(캄보디아어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_12" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::KAZAKH" id="subjectModal_speakerLanguageCd_12" class="language-checkbox">
-                                    <span class="language-option-text">Қазақ(카자흐어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_13" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::KYRGYZ" id="subjectModal_speakerLanguageCd_13" class="language-checkbox">
-                                    <span class="language-option-text">Кыргызча(키르기스어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_14" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::MYANMAR" id="subjectModal_speakerLanguageCd_14" class="language-checkbox">
-                                    <span class="language-option-text">မြန်မာ(미얀마어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_15" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::ARABIC" id="subjectModal_speakerLanguageCd_15" class="language-checkbox">
-                                    <span class="language-option-text">العربية(아랍어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_16" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::HINDI" id="subjectModal_speakerLanguageCd_16" class="language-checkbox">
-                                    <span class="language-option-text">हिन्दी(힌디어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_17" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::PASHTO" id="subjectModal_speakerLanguageCd_17" class="language-checkbox">
-                                    <span class="language-option-text">پښتو(파슈토어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_18" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::FILIPINO" id="subjectModal_speakerLanguageCd_18" class="language-checkbox">
-                                    <span class="language-option-text">Filipino(필리핀어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_19" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::FRENCH" id="subjectModal_speakerLanguageCd_19" class="language-checkbox">
-                                    <span class="language-option-text">Français(프랑스어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_20" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::SPANISH" id="subjectModal_speakerLanguageCd_20" class="language-checkbox">
-                                    <span class="language-option-text">Español(스페인어)</span>
-                                </label>
-                                <label for="subjectModal_speakerLanguageCd_21" class="language-option-card">
-                                    <input type="checkbox" name="subjectModal_speakerLanguageCd" value="LANGUAGE::BENGALI" id="subjectModal_speakerLanguageCd_21" class="language-checkbox">
-                                    <span class="language-option-text">বাংলা(벵골어)</span>
-                                </label>
-                            </div>
-                            <p class="language-limit-notice" style="margin-top: 10px; font-size: 12px; color: #666;">최대 3개까지 선택 가능합니다.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-step-footer">
-                        <button class="language-popup-btn language-popup-btn-cancel" onclick="goBackToSubjectStep()">이전</button>
-                        <button class="language-popup-btn language-popup-btn-save" onclick="saveSubjectAndLanguageSettings()">저장</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 번역 기록 저장 완료 알림 -->
-    <div class="toast" id="toast">
-        <div class="toast-content">
-            <span id="toastMessage"></span>
-        </div>
-    </div>
-
-    <!-- 저장 중/완료 팝업 -->
-    <div class="save-popup-overlay" id="savePopupOverlay" style="display: none;">
-        <div class="save-popup-content">
-            <div class="save-popup-icon" id="savePopupIcon">
-                <div class="loading-dots" id="loadingDots">
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                </div>
-                <div class="save-complete-icon" id="saveCompleteIcon" style="display: none;">✓</div>
-            </div>
-            <div class="save-popup-message" id="savePopupMessage">번역 기록을 저장하는 중입니다</div>
-            <div class="save-popup-button-container" id="savePopupButtonContainer" style="display: none;">
-                <button class="save-popup-confirm-btn" id="savePopupConfirmBtn" onclick="closeSavePopup()">확인</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Room Code 모달 -->
-    <div class="modal-overlay" id="roomCodeModal">
-        <div class="modal-content room-code-popup">
-            <h2 class="room-code-title">Room Code</h2>
-            <div class="room-code-display" id="roomCodeDisplay">
-                <!-- 랜덤 코드가 여기에 표시됩니다 -->
-            </div>
-            <p class="room-code-instruction">Share this code with participants</p>
-            <button class="room-code-close-btn" onclick="closeRoomCodeModal()">Close</button>
-        </div>
-    </div>
-
-    <!-- Language Settings 모달 -->
-    <div class="modal-overlay" id="languageModal">
-        <div class="modal-content language-popup">
-            <div class="language-popup-header">
-                <div class="language-icon-circle">
-                    <span class="language-icon-emoji">🌐</span>
-                </div>
-                <h3 class="language-popup-title">언어 설정</h3>
-                <p class="language-popup-subtitle">원하는 언어를 선택하세요</p>
-            </div>
-            
-            <div class="language-options">
-                <!-- Input Language Section -->
-                <div class="language-section">
-                    <label for="popup_inputLanguageCd" class="language-section-label">입력 언어</label>
-                    <div class="language-input-wrapper">
-                        <select id="popup_inputLanguageCd" name="popup_inputLanguageCd" class="language-popup-select">
-                            <option value="ko" data-code="ko" selected>한국어</option>
-                            <option value="en" data-code="en">영어</option>
-                            <option value="zh" data-code="zh">중국어</option>
-                            <option value="ja" data-code="ja">일본어</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Output Languages Section -->
-                <div class="language-section">
-                    <label class="language-section-label">출력 언어</label>
-                    <div class="output-languages-grid">
-                        <label for="popup_speakerLanguageCd_1" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::ENGLISH" id="popup_speakerLanguageCd_1" class="language-checkbox" checked>
-                            <span class="language-option-text">English(영어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_2" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::CHINESE" id="popup_speakerLanguageCd_2" class="language-checkbox">
-                            <span class="language-option-text">中文(중국어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_3" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::JAPANESE" id="popup_speakerLanguageCd_3" class="language-checkbox">
-                            <span class="language-option-text">日本語(일본어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_4" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::VIETNAMESE" id="popup_speakerLanguageCd_4" class="language-checkbox">
-                            <span class="language-option-text">Tiếng Việt(베트남어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_5" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::UZBEK" id="popup_speakerLanguageCd_5" class="language-checkbox">
-                            <span class="language-option-text">O'zbek(우즈베크어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_6" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::MONGOLIAN" id="popup_speakerLanguageCd_6" class="language-checkbox">
-                            <span class="language-option-text">Монгол(몽골어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_7" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::INDONESIAN" id="popup_speakerLanguageCd_7" class="language-checkbox">
-                            <span class="language-option-text">Bahasa Indonesia(인도네시아어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_8" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::NEPALI" id="popup_speakerLanguageCd_8" class="language-checkbox">
-                            <span class="language-option-text">नेपाली(네팔어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_9" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::RUSSIAN" id="popup_speakerLanguageCd_9" class="language-checkbox">
-                            <span class="language-option-text">Русский(러시아어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_10" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::THAI" id="popup_speakerLanguageCd_10" class="language-checkbox">
-                            <span class="language-option-text">ไทย(태국어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_11" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::KHMER" id="popup_speakerLanguageCd_11" class="language-checkbox">
-                            <span class="language-option-text">ភាសាខ្មែរ(캄보디아어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_12" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::KAZAKH" id="popup_speakerLanguageCd_12" class="language-checkbox">
-                            <span class="language-option-text">Қазақ(카자흐어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_13" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::KYRGYZ" id="popup_speakerLanguageCd_13" class="language-checkbox">
-                            <span class="language-option-text">Кыргызча(키르기스어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_14" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::MYANMAR" id="popup_speakerLanguageCd_14" class="language-checkbox">
-                            <span class="language-option-text">မြန်မာ(미얀마어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_15" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::ARABIC" id="popup_speakerLanguageCd_15" class="language-checkbox">
-                            <span class="language-option-text">العربية(아랍어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_16" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::HINDI" id="popup_speakerLanguageCd_16" class="language-checkbox">
-                            <span class="language-option-text">हिन्दी(힌디어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_17" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::PASHTO" id="popup_speakerLanguageCd_17" class="language-checkbox">
-                            <span class="language-option-text">پښتو(파슈토어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_18" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::FILIPINO" id="popup_speakerLanguageCd_18" class="language-checkbox">
-                            <span class="language-option-text">Filipino(필리핀어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_19" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::FRENCH" id="popup_speakerLanguageCd_19" class="language-checkbox">
-                            <span class="language-option-text">Français(프랑스어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_20" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::SPANISH" id="popup_speakerLanguageCd_20" class="language-checkbox">
-                            <span class="language-option-text">Español(스페인어)</span>
-                        </label>
-                        <label for="popup_speakerLanguageCd_21" class="language-option-card">
-                            <input type="checkbox" name="popup_speakerLanguageCd" value="LANGUAGE::BENGALI" id="popup_speakerLanguageCd_21" class="language-checkbox">
-                            <span class="language-option-text">বাংলা(벵골어)</span>
-                        </label>
-                    </div>
-                    <p class="language-limit-notice" style="margin-top: 10px; font-size: 12px; color: #666;">최대 3개까지 선택 가능합니다.</p>
-                </div>
-            </div>
-            
-            <div class="language-popup-footer">
-                <button class="language-popup-btn language-popup-btn-save" onclick="saveLanguageSettings()">저장</button>
-                <button class="language-popup-btn language-popup-btn-cancel" onclick="closeLanguageModal()">취소</button>
-            </div>
-        </div>
-    </div>
+                        if (tabPath === 'live_lecture.html' && 
+                            (currentPage === 'live_lecture.html' || currentPage === 'poly_talk.html')) {
+                            tab.classList.add('active');
+                        } else if (tabPath === 'index.html' && 
+                            (currentPage === 'index.html' || currentPage === 'mypage.html' || currentPage === 'edit.html')) {
+                            tab.classList.add('active');
+                        } else {
+                            tab.classList.remove('active');
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+

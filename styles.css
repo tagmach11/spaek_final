@@ -490,7 +490,7 @@ body {
 .drop-zone {
     width: 100%;
     min-height: 450px;
-    border-radius: 28px;
+    border-radius: 0;
     background: #ffffff;
     border: 2px dashed rgba(156, 39, 176, 0.3);
     display: flex;
