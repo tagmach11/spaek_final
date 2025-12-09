@@ -552,11 +552,10 @@ body {
 .upload-icon {
     width: 64px;
     height: 64px;
-    color: #9c27b0;
     animation: float-icon 3s ease-in-out infinite;
     will-change: transform;
     transform: translateZ(0); /* GPU 가속 */
-    filter: drop-shadow(0 4px 8px rgba(156, 39, 176, 0.2));
+    object-fit: contain;
 }
 
 .drop-zone-text {
