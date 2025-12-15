@@ -6,6 +6,44 @@
             warn: isDev ? console.warn.bind(console) : () => {}
         };
 
+        // 성능 최적화: 디바운싱 함수
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // 성능 최적화: 쓰로틀링 함수
+        function throttle(func, limit) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    func.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        }
+
+        // 성능 최적화: requestAnimationFrame 기반 쓰로틀링
+        function rafThrottle(func) {
+            let rafId = null;
+            return function(...args) {
+                if (rafId === null) {
+                    rafId = requestAnimationFrame(() => {
+                        func.apply(this, args);
+                        rafId = null;
+                    });
+                }
+            };
+        }
+
         // URL에서 비디오 ID 가져오기
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = urlParams.get('id');
@@ -135,7 +173,7 @@
                 // 사용 가능한 언어 목록 생성 (원본 언어 + 대상 언어들)
                 availableLanguages = [];
                 
-                // 원본 언어 추가 (auto인 경우 처리)
+                // 원본 언어 추가 (auto인 경우는 제외)
                 if (originalLang && originalLang !== 'auto') {
                     const originalLangInfo = getLanguageInfo(originalLang);
                     availableLanguages.push({
@@ -144,15 +182,8 @@
                         flag: originalLangInfo.flag,
                         isOriginal: true
                     });
-                } else if (originalLang === 'auto') {
-                    // 자동 감지인 경우 기본 언어로 표시
-                    availableLanguages.push({
-                        code: 'auto',
-                        name: '자동 감지',
-                        flag: '🌐',
-                        isOriginal: true
-                    });
                 }
+                // auto인 경우는 탭에 표시하지 않음
                 
                 // 대상 언어들 추가
                 targetLanguages.forEach(targetLang => {
@@ -176,8 +207,9 @@
                     ];
                 }
                 
-                // 첫 번째 언어를 기본 선택
-                currentLang = availableLanguages[0].code;
+                // 첫 번째 언어를 기본 선택 (auto 제외)
+                const firstNonAutoLang = availableLanguages.find(lang => lang.code !== 'auto');
+                currentLang = firstNonAutoLang ? firstNonAutoLang.code : (availableLanguages[0]?.code || 'ko');
                 
                 logger.log('번역 설정 로드:', {
                     originalLang,
@@ -422,12 +454,14 @@
                 return;
             }
             
-            // 비디오 이벤트 리스너 설정
-            videoPlayer.addEventListener('timeupdate', () => {
+            // 비디오 이벤트 리스너 설정 (최적화: 쓰로틀링 적용)
+            const throttledTimeUpdate = rafThrottle(() => {
                 currentTime = videoPlayer.currentTime;
                 updateProgress();
                 updateSubtitle();
             });
+            
+            videoPlayer.addEventListener('timeupdate', throttledTimeUpdate);
             
             videoPlayer.addEventListener('ended', () => {
                 isPlaying = false;
@@ -441,6 +475,10 @@
                     updateProgress();
                 }
                 toggleVideoPlayerElements(true);
+                // 커스텀 컨트롤 초기화
+                setTimeout(() => {
+                    initializeCustomControls();
+                }, 100);
                 logger.log('비디오 로드 완료, 플레이어 표시');
             };
             
@@ -448,6 +486,9 @@
             videoPlayer.addEventListener('canplay', handleVideoLoaded, { once: true });
             videoPlayer.addEventListener('loadeddata', () => {
                 toggleVideoPlayerElements(true);
+                setTimeout(() => {
+                    initializeCustomControls();
+                }, 100);
                 logger.log('비디오 데이터 로드 완료');
             }, { once: true });
             
@@ -566,20 +607,49 @@
             const languageTabsContainer = DOMCache.languageTabs;
             if (!languageTabsContainer) return;
             
-            languageTabsContainer.innerHTML = availableLanguages.map((lang, index) => {
-                const isActive = index === 0 || lang.code === currentLang;
-                
-                return `
-                    <div class="lang-tab ${isActive ? 'active' : ''}" data-lang="${lang.code}">
-                        ${lang.isOriginal ? '<i class="fas fa-language" style="font-size: 1rem; color: #808080;"></i>' : `<span class="lang-flag">${lang.flag}</span>`}
-                        ${lang.isOriginal ? `<span>${lang.name === '자동 감지' ? '자동 감지' : lang.name} (원본)</span>` : `<span>${lang.name}</span>`}
-                    </div>
-                `;
-            }).join('');
+            // 번역 설정에서 가져온 언어들로 탭 동적 생성 (HTML의 하드코딩된 탭 무시)
+            if (availableLanguages.length === 0) {
+                logger.warn('사용 가능한 언어가 없습니다. 기본 언어를 사용합니다.');
+                // 기본 언어 설정
+                availableLanguages = [
+                    { code: 'ko', name: '한국어', flag: '🇰🇷', isOriginal: true },
+                    { code: 'en', name: '영어', flag: '🇺🇸', isOriginal: false }
+                ];
+            }
             
-            // 언어 탭 클릭 이벤트
+            // 언어 탭 동적 생성 (번역 설정에 따라, 'auto' 제외)
+            languageTabsContainer.innerHTML = availableLanguages
+                .filter(lang => lang.code !== 'auto') // 'auto' 언어 탭 제거
+                .map((lang, index) => {
+                    const isActive = index === 0 || lang.code === currentLang;
+                    
+                    return `
+                        <div class="lang-tab ${isActive ? 'active' : ''}" data-lang="${lang.code}">
+                            <span>${lang.name}</span>
+                        </div>
+                    `;
+                }).join('');
+            
+            // 초기 언어 설정 (auto 제외)
+            const filteredLanguages = availableLanguages.filter(lang => lang.code !== 'auto');
+            if (filteredLanguages.length > 0) {
+                currentLang = filteredLanguages[0].code;
+            }
+            
+            // 언어 탭 이벤트 설정
+            setupLanguageTabEvents();
+            
+            logger.log('언어 탭 렌더링 완료:', availableLanguages.map(l => l.name).join(', '));
+        }
+        
+        // 언어 탭 이벤트 설정
+        function setupLanguageTabEvents() {
             document.querySelectorAll('.lang-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
+                // 기존 이벤트 리스너 제거를 위해 클론
+                const newTab = tab.cloneNode(true);
+                tab.parentNode.replaceChild(newTab, tab);
+                
+                newTab.addEventListener('click', function() {
                     document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     currentLang = this.dataset.lang;
@@ -594,12 +664,15 @@
                     setupTextInputEvents();
                 });
             });
-            
-            // 초기 언어 설정
-            if (availableLanguages.length > 0) {
-                currentLang = availableLanguages[0].code;
-            }
         }
+        
+        // 페이지 로드 시 언어 탭 이벤트 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // HTML에 이미 있는 언어 탭에 이벤트 설정
+            setTimeout(() => {
+                setupLanguageTabEvents();
+            }, 100);
+        });
         
         // 트랜스크립션 렌더링 (탭 기반 - 선택된 언어만 표시) (최적화)
         function renderTranscriptions() {
@@ -619,30 +692,72 @@
                 const text = segment[langCode] || segment[getLanguageFieldName(langCode)] || '';
                 const placeholder = currentLangInfo.isOriginal ? `${currentLangInfo.name} 자막을 입력하세요` : `${currentLangInfo.name} subtitle`;
                 
+                // 원본 언어 텍스트 가져오기 (자동 감지)
+                // originalLang이 'auto'인 경우, 실제로 감지된 언어나 첫 번째 사용 가능한 언어 사용
+                let actualOriginalLang = originalLang;
+                let originalText = '';
+                
+                if (originalLang === 'auto') {
+                    // auto인 경우, 세그먼트에 저장된 원본 언어 필드 찾기
+                    // 일반적으로 'korean', 'english' 등 필드명이나 언어 코드로 저장됨
+                    // 먼저 세그먼트에 원본 언어 정보가 있는지 확인
+                    if (segment.originalLang && segment.originalLang !== 'auto') {
+                        actualOriginalLang = segment.originalLang;
+                    } else {
+                        // 세그먼트에 저장된 텍스트 필드 중 첫 번째로 찾기
+                        const possibleFields = ['korean', 'english', 'ko', 'en'];
+                        for (const field of possibleFields) {
+                            if (segment[field]) {
+                                originalText = segment[field];
+                                actualOriginalLang = field === 'korean' ? 'ko' : (field === 'english' ? 'en' : field);
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // 원본 텍스트가 아직 없으면 언어 코드로 찾기
+                if (!originalText) {
+                    originalText = segment[actualOriginalLang] || segment[getLanguageFieldName(actualOriginalLang)] || '';
+                }
+                const outputText = text;
+                const outputCharCount = (outputText || '').length;
+                
+                // 언어 정보 가져오기
+                const langInfo = getLanguageInfo(langCode);
+                
                 return `
                     <div class="transcription-item" data-segment-id="${segment.id}">
                         <div class="segment-header">
                             <div class="speaker-icon">${segment.speaker ? segment.speaker.charAt(segment.speaker.length - 1) : '1'}</div>
                             <span class="speaker-name">${segment.speaker || '화자 1'}</span>
                             <div class="timestamp-controls">
-                                <button class="time-btn" onclick="seekToTime(${segment.startTime})" title="해당 시간으로 이동">
-                                    <span class="timestamp">${startTime} - ${endTime} ${duration}sec</span>
-                                </button>
+                                <span class="timestamp">${startTime} - ${endTime} ${duration}sec</span>
                                 <button class="edit-time-btn" onclick="editSegmentTime(${segment.id})" title="시간 편집">
                                     <i class="fas fa-clock"></i>
                                 </button>
+                                <button class="delete-segment-btn" onclick="deleteSegment(${segment.id})" title="세그먼트 삭제">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <span class="char-count-badge">${outputCharCount}</span>
                             </div>
-                            <button class="delete-segment-btn" onclick="deleteSegment(${segment.id})" title="세그먼트 삭제">
-                                <i class="fas fa-trash"></i>
-                            </button>
                         </div>
                         <div class="text-content">
-                            <div class="text-editor">
-                                <div class="text-label">
-                                    ${currentLangInfo.name} ${currentLangInfo.isOriginal ? '<span style="font-size: 0.7rem; color: #999;">(원본)</span>' : ''}
-                                    <span class="char-count" data-lang="${langCode}" data-segment-id="${segment.id}">${(text || '').length}</span>
+                            <div class="original-text">
+                                <div class="auto-detect-label">
+                                    <i class="fas fa-globe"></i>
+                                    <span>자동 감지</span>
                                 </div>
-                                <textarea class="text-input" data-lang="${langCode}" data-segment-id="${segment.id}" placeholder="${placeholder}">${text}</textarea>
+                                <textarea class="text-input" data-lang="${originalLang}" data-segment-id="${segment.id}" placeholder="자동 감지 자막을 입력하세요">${originalText}</textarea>
+                            </div>
+                            <div class="arrow-icon">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="translation-text">
+                                <div class="output-label">
+                                    <span>${currentLangInfo.name || langInfo.name}</span>
+                                </div>
+                                <textarea class="text-input" data-lang="${langCode}" data-segment-id="${segment.id}" placeholder="${placeholder}" readonly>${outputText}</textarea>
                             </div>
                         </div>
                     </div>
@@ -661,7 +776,8 @@
                 const newInput = input.cloneNode(true);
                 input.parentNode.replaceChild(newInput, input);
                 
-                newInput.addEventListener('input', function() {
+                // 최적화: 디바운싱된 입력 핸들러
+                const debouncedInput = debounce(function() {
                     const segmentId = parseInt(this.dataset.segmentId);
                     const lang = this.dataset.lang;
                     const segment = transcriptions.find(s => s.id === segmentId);
@@ -690,6 +806,21 @@
                         // 변경사항 표시
                         markAsChanged(segmentId);
                     }
+                }, 300);
+                
+                // 즉시 업데이트가 필요한 경우 (문자 수 등)
+                newInput.addEventListener('input', function() {
+                    const segmentId = parseInt(this.dataset.segmentId);
+                    const lang = this.dataset.lang;
+                    
+                    // 문자 수는 즉시 업데이트
+                    const charCount = document.querySelector(`.char-count[data-lang="${lang}"][data-segment-id="${segmentId}"]`);
+                    if (charCount) {
+                        charCount.textContent = this.value.length;
+                    }
+                    
+                    // 나머지는 디바운싱
+                    debouncedInput.call(this);
                 });
                 
                 // 포커스 시 해당 세그먼트 하이라이트
@@ -721,10 +852,23 @@
                 });
             });
             
-            // 자막 클릭 시 해당 시간으로 이동
-            document.querySelectorAll('.timestamp').forEach(timestamp => {
-                timestamp.style.cursor = 'pointer';
-            });
+            // 자막 클릭 시 해당 시간으로 이동 (최적화: 이벤트 위임)
+            const transcriptionList = DOMCache.transcriptionList;
+            if (transcriptionList) {
+                transcriptionList.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('timestamp') || e.target.closest('.timestamp')) {
+                        const timestamp = e.target.classList.contains('timestamp') ? e.target : e.target.closest('.timestamp');
+                        const segmentItem = timestamp.closest('.transcription-item');
+                        if (segmentItem) {
+                            const segmentId = parseInt(segmentItem.dataset.segmentId);
+                            const segment = transcriptions.find(s => s.id === segmentId);
+                            if (segment) {
+                                seekToTime(segment.startTime);
+                            }
+                        }
+                    }
+                });
+            }
         }
         
         // 해당 시간으로 이동 (최적화)
@@ -869,10 +1013,16 @@
             });
         }
 
-        // 진행 상태 업데이트 (최적화)
+        // 진행 상태 업데이트 (최적화: requestAnimationFrame 사용)
+        let progressUpdateRaf = null;
         function updateProgress() {
             if (!videoDuration) return;
             
+            if (progressUpdateRaf) {
+                cancelAnimationFrame(progressUpdateRaf);
+            }
+            
+            progressUpdateRaf = requestAnimationFrame(() => {
             const percent = Math.min(100, Math.max(0, (currentTime / videoDuration) * 100));
             
             if (DOMCache.progressFill) {
@@ -881,19 +1031,30 @@
             if (DOMCache.timeDisplay) {
                 DOMCache.timeDisplay.textContent = formatTimeDisplay(currentTime);
             }
+                progressUpdateRaf = null;
+            });
         }
         
-        // 자막 업데이트 (최적화)
+        // 자막 업데이트 (최적화: requestAnimationFrame 사용)
+        let subtitleUpdateRaf = null;
         function updateSubtitle() {
             if (!showSubtitles || !videoPlayer) {
                 if (DOMCache.subtitleText) DOMCache.subtitleText.textContent = '';
                 return;
             }
             
+            if (subtitleUpdateRaf) {
+                cancelAnimationFrame(subtitleUpdateRaf);
+            }
+            
+            subtitleUpdateRaf = requestAnimationFrame(() => {
             const currentTime = videoPlayer.currentTime;
             const subtitleText = DOMCache.subtitleText;
             
-            if (!subtitleText) return;
+                if (!subtitleText) {
+                    subtitleUpdateRaf = null;
+                    return;
+                }
             
             // 현재 시간에 맞는 자막 찾기
             const currentSegment = transcriptions.find(segment => {
@@ -930,6 +1091,9 @@
             } else {
                 subtitleText.style.opacity = '0';
             }
+                
+                subtitleUpdateRaf = null;
+            });
         }
 
         // 시간 표시 포맷
@@ -1113,8 +1277,8 @@
                 mobileMenuBtn.style.display = 'block';
             }
             
-            // 윈도우 리사이즈 이벤트
-            window.addEventListener('resize', () => {
+            // 윈도우 리사이즈 이벤트 (최적화: 쓰로틀링 적용)
+            const throttledResize = throttle(() => {
                 if (window.innerWidth <= 768) {
                     mobileMenuBtn.style.display = 'block';
                 } else {
@@ -1122,7 +1286,9 @@
                     sidebar.classList.remove('mobile-open');
                     sidebarOverlay.classList.remove('active');
                 }
-            });
+            }, 250);
+            
+            window.addEventListener('resize', throttledResize);
             
             // 메뉴 버튼 클릭
             mobileMenuBtn.addEventListener('click', () => {
@@ -1229,6 +1395,9 @@
                 videoPlayer.addEventListener('loadedmetadata', () => {
                     videoDuration = videoPlayer.duration;
                     updateProgress();
+                    setTimeout(() => {
+                        initializeCustomControls();
+                    }, 100);
                 }, { once: true });
                 
                 // 비디오 로드 오류 처리
@@ -1327,6 +1496,158 @@
                     }
                 }
             });
+        }
+
+        // 커스텀 비디오 컨트롤 바 초기화
+        let controlsInitialized = false;
+        function initializeCustomControls() {
+            if (controlsInitialized) return;
+            
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const currentTimeEl = document.getElementById('current-time');
+            const totalTimeEl = document.getElementById('total-time');
+            const ccBtn = document.getElementById('cc-btn');
+            const volumeBtn = document.getElementById('volume-btn');
+            const playbackSpeedEl = document.getElementById('playback-speed');
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const customControls = document.getElementById('custom-video-controls');
+
+            if (!videoPlayer || !customControls) return;
+            
+            controlsInitialized = true;
+
+            // 시간 포맷 함수
+            function formatTime(seconds) {
+                const h = Math.floor(seconds / 3600);
+                const m = Math.floor((seconds % 3600) / 60);
+                const s = Math.floor(seconds % 60);
+                return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+
+            // 시간 업데이트
+            function updateTimeDisplay() {
+                if (currentTimeEl && videoPlayer) {
+                    currentTimeEl.textContent = formatTime(videoPlayer.currentTime);
+                }
+                if (totalTimeEl && videoPlayer && videoPlayer.duration) {
+                    totalTimeEl.textContent = formatTime(videoPlayer.duration);
+                }
+            }
+
+            // 재생/일시정지 버튼
+            if (playPauseBtn) {
+                playPauseBtn.addEventListener('click', () => {
+                    if (videoPlayer.paused) {
+                        videoPlayer.play();
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        isPlaying = true;
+                    } else {
+                        videoPlayer.pause();
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        isPlaying = false;
+                    }
+                });
+            }
+
+            // 비디오 이벤트 리스너
+            videoPlayer.addEventListener('play', () => {
+                if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                isPlaying = true;
+            });
+
+            videoPlayer.addEventListener('pause', () => {
+                if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                isPlaying = false;
+            });
+
+            videoPlayer.addEventListener('timeupdate', () => {
+                updateTimeDisplay();
+            });
+
+            videoPlayer.addEventListener('loadedmetadata', () => {
+                updateTimeDisplay();
+            });
+
+            // 자막 버튼
+            if (ccBtn) {
+                ccBtn.addEventListener('click', () => {
+                    showSubtitles = !showSubtitles;
+                    const subtitleOverlay = document.getElementById('subtitle-overlay');
+                    if (subtitleOverlay) {
+                        subtitleOverlay.style.display = showSubtitles ? 'block' : 'none';
+                    }
+                    ccBtn.style.opacity = showSubtitles ? '1' : '0.5';
+                });
+            }
+
+            // 볼륨 버튼
+            if (volumeBtn) {
+                volumeBtn.addEventListener('click', () => {
+                    isMuted = !isMuted;
+                    videoPlayer.muted = isMuted;
+                    if (isMuted) {
+                        volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                    } else {
+                        volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    }
+                });
+            }
+
+            // 재생 속도
+            const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+            let speedIndex = 2; // 1x가 기본값
+
+            if (playbackSpeedEl) {
+                playbackSpeedEl.addEventListener('click', () => {
+                    speedIndex = (speedIndex + 1) % speeds.length;
+                    playbackRate = speeds[speedIndex];
+                    videoPlayer.playbackRate = playbackRate;
+                    playbackSpeedEl.textContent = playbackRate + 'x';
+                });
+            }
+
+            // 전체화면 버튼
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', () => {
+                    const videoWrapper = document.querySelector('.video-player-wrapper');
+                    if (!document.fullscreenElement) {
+                        if (videoWrapper && videoWrapper.requestFullscreen) {
+                            videoWrapper.requestFullscreen();
+                        } else if (videoWrapper && videoWrapper.webkitRequestFullscreen) {
+                            videoWrapper.webkitRequestFullscreen();
+                        } else if (videoWrapper && videoWrapper.mozRequestFullScreen) {
+                            videoWrapper.mozRequestFullScreen();
+                        } else if (videoWrapper && videoWrapper.msRequestFullscreen) {
+                            videoWrapper.msRequestFullscreen();
+                        }
+                        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        }
+                        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                    }
+                });
+
+                // 전체화면 변경 감지
+                document.addEventListener('fullscreenchange', () => {
+                    if (fullscreenBtn) {
+                        fullscreenBtn.innerHTML = document.fullscreenElement 
+                            ? '<i class="fas fa-compress"></i>' 
+                            : '<i class="fas fa-expand"></i>';
+                    }
+                });
+            }
+
+            // 초기 상태 설정
+            updateTimeDisplay();
+            if (playbackSpeedEl) playbackSpeedEl.textContent = playbackRate + 'x';
         }
 
         // 초기화 (최적화)

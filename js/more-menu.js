@@ -403,6 +403,12 @@
         state.isMenuOpen = !state.isMenuOpen;
         
         if (state.isMenuOpen) {
+            // 사용자 드롭다운 닫기
+            const userDropdown = document.querySelector('.user-dropdown-menu');
+            if (userDropdown) {
+                userDropdown.style.display = 'none';
+            }
+            
             DOMCache.moreMenuDropdown.classList.add('active');
             DOMCache.moreMenuDropdown.classList.remove('has-submenu-active'); // 메뉴 열 때 블러 효과 제거
             DOMCache.moreMenuBtn.setAttribute('aria-expanded', 'true');

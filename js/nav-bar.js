@@ -191,6 +191,13 @@
         if (moreMenuBtn && moreMenuDropdown) {
             moreMenuBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
+                
+                // 사용자 드롭다운 닫기
+                const userDropdown = document.querySelector('.user-dropdown-menu');
+                if (userDropdown) {
+                    userDropdown.style.display = 'none';
+                }
+                
                 moreMenuDropdown.classList.toggle('active');
             });
             

@@ -63,127 +63,101 @@
                     </div>
                 </div>
                 <div class="more-menu-dropdown" id="moreMenuDropdown">
-                    <div class="more-menu-dropdown-content">
-                        <ul class="menu-comp">
-                            <!-- 도움 서브메뉴 패널 -->
-                            <div class="submenu-panel submenu-panel--help" id="helpSubmenuPanel">
-                                    <ul class="help-menu-list">
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="used.html" data-i18n-title="help-usage">
-                                                <div class="navbar__item__icon"><i class="fas fa-book"></i></div>
-                                                <div class="navbar__item__title" data-i18n="help-usage">사용방법</div>
-                                            </a>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="#" data-i18n-title="help-faq">
-                                                <div class="navbar__item__icon"><i class="fas fa-question-circle"></i></div>
-                                                <div class="navbar__item__title" data-i18n="help-faq">자주 묻는 질문</div>
-                                            </a>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="#" data-i18n-title="help-tools">
-                                                <div class="navbar__item__icon"><i class="fas fa-tools"></i></div>
-                                                <div class="navbar__item__title" data-i18n="help-tools">도구</div>
-                                            </a>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="#" data-i18n-title="help-legal">
-                                                <div class="navbar__item__icon"><i class="fas fa-gavel"></i></div>
-                                                <div class="navbar__item__title" data-i18n="help-legal">법률 & 개인 정보 보호</div>
-                                            </a>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="#" data-i18n-title="help-contact">
-                                                <div class="navbar__item__icon"><i class="fas fa-envelope"></i></div>
-                                                <div class="navbar__item__title" data-i18n="help-contact">문의</div>
-                                            </a>
-                                        </li>
-                                    </ul>
+                    <div class="mega-menu-content">
+                        <!-- 1열: 기타 제품 -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-section-title">기타 제품</div>
+                            <a href="../index.html" class="mega-menu-item">
+                                <div class="mega-menu-item-icon"><i class="fas fa-closed-captioning"></i></div>
+                                <div class="mega-menu-item-text">
+                                    <div class="mega-menu-item-title">자막생성</div>
+                                    <div class="mega-menu-item-desc">AI 기반 실시간 번역</div>
                                 </div>
-                                <!-- 언어 서브메뉴 패널 - 솔루션 부분에 표시 -->
-                                <div class="submenu-panel submenu-panel--language" id="languageSubmenuPanel">
-                                    <ul class="language-menu-list">
-                                        <li class="navbar__item navbar__item--xs">
-                                            <div class="language-item" data-lang="ko">
-                                                <div class="navbar__item__icon"><i class="fas fa-globe"></i></div>
-                                                <div class="navbar__item__title">한국어</div>
-                                                <i class="fas fa-check language-check"></i>
-                                            </div>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <div class="language-item" data-lang="ja">
-                                                <div class="navbar__item__icon"><i class="fas fa-globe"></i></div>
-                                                <div class="navbar__item__title">日本語</div>
-                                                <i class="fas fa-check language-check" style="display: none;"></i>
-                                            </div>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <div class="language-item" data-lang="zh">
-                                                <div class="navbar__item__icon"><i class="fas fa-globe"></i></div>
-                                                <div class="navbar__item__title">中文 (简体)</div>
-                                                <i class="fas fa-check language-check" style="display: none;"></i>
-                                            </div>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <div class="language-item" data-lang="fr">
-                                                <div class="navbar__item__icon"><i class="fas fa-globe"></i></div>
-                                                <div class="navbar__item__title">Français</div>
-                                                <i class="fas fa-check language-check" style="display: none;"></i>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                <i class="fas fa-arrow-right mega-menu-arrow"></i>
+                            </a>
+                            <a href="#" class="mega-menu-item">
+                                <div class="mega-menu-item-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                                <div class="mega-menu-item-text">
+                                    <div class="mega-menu-item-title">강의 번역</div>
+                                    <div class="mega-menu-item-desc">라이브 번역 및 자막</div>
                                 </div>
-                            </li>
-                            <li>
-                                <div class="menu-comp__general">
-                                    <ul>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="pricing.html" data-i18n-title="menu-pricing">
-                                                <div class="navbar__item__icon"><i class="fas fa-tag"></i></div>
-                                                <div class="navbar__item__title" data-i18n="menu-pricing">가격</div>
-                                            </a>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="#" data-i18n-title="menu-security">
-                                                <div class="navbar__item__icon"><i class="fas fa-shield-alt"></i></div>
-                                                <div class="navbar__item__title" data-i18n="menu-security">보안</div>
-                                            </a>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="#" data-i18n-title="menu-features">
-                                                <div class="navbar__item__icon"><i class="fas fa-star"></i></div>
-                                                <div class="navbar__item__title" data-i18n="menu-features">기능</div>
-                                            </a>
-                                        </li>
-                                        <li class="navbar__item navbar__item--xs">
-                                            <a href="#" data-i18n-title="menu-about">
-                                                <div class="navbar__item__icon"><i class="fas fa-heart"></i></div>
-                                                <div class="navbar__item__title" data-i18n="menu-about">회사 소개</div>
-                                            </a>
-                                        </li>
-                                        <li class="divider divider--break"></li>
-                                        <li class="nav-has-dropdown">
-                                            <div class="navbar__item navbar__item--xs help-setting-item" id="helpSettingBtn">
-                                                <div>
-                                                    <div class="navbar__item__icon"><i class="fas fa-chevron-left"></i></div>
-                                                    <div class="navbar__item__title" data-i18n="menu-help">도움</div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="nav-has-dropdown">
-                                            <div class="navbar__item navbar__item--xs language-setting-item" id="languageSettingBtn">
-                                                <div>
-                                                    <div class="navbar__item__icon"><i class="fas fa-chevron-left"></i></div>
-                                                    <div class="navbar__item__title" data-i18n="menu-language">언어</div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
+                                <i class="fas fa-arrow-right mega-menu-arrow"></i>
+                            </a>
+                        </div>
+                        <!-- 2열: 링크 목록 -->
+                        <div class="mega-menu-column mega-menu-links">
+                            <a href="pricing.html" class="mega-menu-link">
+                                <i class="fas fa-file-alt"></i>
+                                <span>가격</span>
+                            </a>
+                            <a href="#" class="mega-menu-link">
+                                <i class="fas fa-lock"></i>
+                                <span>보안</span>
+                            </a>
+                            <a href="#" class="mega-menu-link">
+                                <i class="fas fa-th-large"></i>
+                                <span>기능</span>
+                            </a>
+                            <a href="#" class="mega-menu-link">
+                                <i class="fas fa-tags"></i>
+                                <span>회사 소개</span>
+                            </a>
+                            <div class="mega-menu-divider" style="height: 1px; background: #e5e7eb; margin: 16px 0;"></div>
+                            <div class="mega-menu-link has-submenu" id="helpMenuBtn">
+                                <i class="fas fa-chevron-left"></i>
+                                <span>도움</span>
+                            </div>
+                            <div class="mega-menu-link has-submenu" id="languageMenuBtn">
+                                <i class="fas fa-chevron-left"></i>
+                                <span>언어</span>
+                            </div>
+                        </div>
+                        <!-- 도움 서브메뉴 -->
+                        <div class="mega-submenu" id="helpSubmenu">
+                            <a href="used.html" class="mega-submenu-item">
+                                <i class="fas fa-book"></i>
+                                <span>사용방법</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-question-circle"></i>
+                                <span>자주 묻는 질문</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-tools"></i>
+                                <span>도구</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-user-shield"></i>
+                                <span>법률 & 개인 정보 보호</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>문의</span>
+                            </a>
+                        </div>
+                        <!-- 언어 서브메뉴 -->
+                        <div class="mega-submenu" id="languageSubmenu">
+                            <div class="mega-submenu-item language-option" data-lang="ko">
+                                <span>한국어</span>
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="en">
+                                <span>English</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="ja">
+                                <span>日本語</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="zh">
+                                <span>中文</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="fr">
+                                <span>Français</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -304,6 +278,161 @@
     <script src="../js/script.js" defer></script>
     <script src="../js/more-menu.js" defer></script>
     <script src="../js/language-selector.js" defer></script>
+    <script>
+        // 서브메뉴 호버 기능
+        document.addEventListener('DOMContentLoaded', function() {
+            const helpMenuBtn = document.getElementById('helpMenuBtn');
+            const languageMenuBtn = document.getElementById('languageMenuBtn');
+            const helpSubmenu = document.getElementById('helpSubmenu');
+            const languageSubmenu = document.getElementById('languageSubmenu');
+            const megaMenuContent = document.querySelector('.mega-menu-content');
+            
+            // 서브메뉴 닫기 함수
+            function closeAllSubmenus() {
+                if (helpSubmenu) helpSubmenu.classList.remove('active');
+                if (languageSubmenu) languageSubmenu.classList.remove('active');
+                if (megaMenuContent) megaMenuContent.classList.remove('blurred');
+            }
+            
+            if (helpMenuBtn && helpSubmenu) {
+                let helpTimeout = null;
+                
+                helpMenuBtn.addEventListener('mouseenter', () => {
+                    if (helpTimeout) clearTimeout(helpTimeout);
+                    // 언어 서브메뉴 닫기
+                    if (languageSubmenu) {
+                        languageSubmenu.classList.remove('active');
+                    }
+                    // 도움 서브메뉴 열기
+                    helpSubmenu.classList.add('active');
+                    if (megaMenuContent) megaMenuContent.classList.add('blurred');
+                });
+                
+                helpMenuBtn.addEventListener('mouseleave', () => {
+                    helpTimeout = setTimeout(() => {
+                        helpSubmenu.classList.remove('active');
+                        if (megaMenuContent && !languageSubmenu.classList.contains('active')) {
+                            megaMenuContent.classList.remove('blurred');
+                        }
+                    }, 150);
+                });
+                
+                helpSubmenu.addEventListener('mouseenter', () => {
+                    if (helpTimeout) clearTimeout(helpTimeout);
+                });
+                
+                helpSubmenu.addEventListener('mouseleave', () => {
+                    helpSubmenu.classList.remove('active');
+                    if (megaMenuContent && !languageSubmenu.classList.contains('active')) {
+                        megaMenuContent.classList.remove('blurred');
+                    }
+                });
+            }
+            
+            if (languageMenuBtn && languageSubmenu) {
+                let languageTimeout = null;
+                
+                languageMenuBtn.addEventListener('mouseenter', () => {
+                    if (languageTimeout) clearTimeout(languageTimeout);
+                    // 도움 서브메뉴 닫기
+                    if (helpSubmenu) {
+                        helpSubmenu.classList.remove('active');
+                    }
+                    // 언어 서브메뉴 열기
+                    languageSubmenu.classList.add('active');
+                    if (megaMenuContent) megaMenuContent.classList.add('blurred');
+                });
+                
+                languageMenuBtn.addEventListener('mouseleave', () => {
+                    languageTimeout = setTimeout(() => {
+                        languageSubmenu.classList.remove('active');
+                        if (megaMenuContent && !helpSubmenu.classList.contains('active')) {
+                            megaMenuContent.classList.remove('blurred');
+                        }
+                    }, 150);
+                });
+                
+                languageSubmenu.addEventListener('mouseenter', () => {
+                    if (languageTimeout) clearTimeout(languageTimeout);
+                });
+                
+                languageSubmenu.addEventListener('mouseleave', () => {
+                    languageSubmenu.classList.remove('active');
+                    if (megaMenuContent && !helpSubmenu.classList.contains('active')) {
+                        megaMenuContent.classList.remove('blurred');
+                    }
+                });
+                
+                // 언어 옵션 클릭 이벤트
+                const languageOptions = languageSubmenu.querySelectorAll('.language-option');
+                languageOptions.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const selectedLang = this.getAttribute('data-lang');
+                        if (!selectedLang) return;
+                        
+                        // localStorage에 저장 (모든 페이지에 적용)
+                        localStorage.setItem('siteLanguage', selectedLang);
+                        
+                        // 모든 체크 아이콘 숨기기
+                        languageOptions.forEach(opt => {
+                            const checkIcon = opt.querySelector('.fa-check');
+                            if (checkIcon) {
+                                checkIcon.style.visibility = 'hidden';
+                            }
+                            opt.classList.remove('active');
+                        });
+                        
+                        // 선택된 언어에 체크 표시
+                        const checkIcon = this.querySelector('.fa-check');
+                        if (checkIcon) {
+                            checkIcon.style.visibility = 'visible';
+                        }
+                        this.classList.add('active');
+                        
+                        // i18n.js를 통한 언어 변경 (모든 페이지에 적용)
+                        if (window.i18n && typeof window.i18n.setLanguage === 'function') {
+                            window.i18n.setLanguage(selectedLang);
+                        } else {
+                            // i18n.js가 없으면 localStorage에 저장하고 페이지 새로고침
+                            localStorage.setItem('siteLanguage', selectedLang);
+                            window.location.reload();
+                        }
+                        
+                        // 언어 변경 이벤트 발생 (다른 컴포넌트 업데이트)
+                        const event = new CustomEvent('languageChanged', {
+                            detail: { language: selectedLang },
+                            bubbles: true
+                        });
+                        document.dispatchEvent(event);
+                        
+                        // HTML lang 속성 즉시 업데이트
+                        document.documentElement.setAttribute('lang', selectedLang);
+                    });
+                });
+                
+                // 초기 언어 선택 상태 복원
+                const currentLang = localStorage.getItem('siteLanguage') || 'ko';
+                languageOptions.forEach(option => {
+                    const lang = option.getAttribute('data-lang');
+                    if (lang === currentLang) {
+                        const checkIcon = option.querySelector('.fa-check');
+                        if (checkIcon) {
+                            checkIcon.style.visibility = 'visible';
+                        }
+                        option.classList.add('active');
+                    } else {
+                        const checkIcon = option.querySelector('.fa-check');
+                        if (checkIcon) {
+                            checkIcon.style.visibility = 'hidden';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 

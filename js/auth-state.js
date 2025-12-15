@@ -238,6 +238,13 @@
                 userInfoEl.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const isVisible = dropdown.style.display === 'block';
+                    
+                    // 더보기 메뉴 닫기
+                    const moreMenuDropdown = document.getElementById('moreMenuDropdown');
+                    if (moreMenuDropdown) {
+                        moreMenuDropdown.classList.remove('active');
+                    }
+                    
                     dropdown.style.display = isVisible ? 'none' : 'block';
                 });
                 

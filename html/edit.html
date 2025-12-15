@@ -9,8 +9,160 @@
     <link rel="stylesheet" href="../css/edit.css">
 </head>
 <body>
-    <!-- 네비게이션 바 플레이스홀더 -->
-    <div id="nav-placeholder"></div>
+    <!-- 모바일 메뉴 버튼 -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" style="display: none;">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 사이드바 오버레이 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- 배경 효과 -->
+    <div class="background-effects">
+        <div class="gradient-cloud cloud-1"></div>
+        <div class="gradient-cloud cloud-2"></div>
+        <div class="gradient-cloud cloud-3"></div>
+        <canvas id="particles-canvas"></canvas>
+        <canvas id="confetti-canvas"></canvas>
+        <div class="reflection-light"></div>
+    </div>
+
+    <!-- 상단 네비게이션 -->
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <div class="logo" onclick="location.href='../index.html'">
+                    <img src="../assets/image/AX2_logo.png" alt="AX2" class="logo-img">
+                </div>
+                <div class="service-tabs">
+                    <a href="../index.html" class="service-tab">
+                        <span data-i18n="nav-auto-translate">자막생성</span>
+                    </a>
+                    <a href="used.html" class="service-tab">
+                        <span data-i18n="nav-usage">사용방법</span>
+                    </a>
+                    <a href="pricing.html" class="service-tab">
+                        <span data-i18n="nav-pricing">요금제/결제</span>
+                    </a>
+                </div>
+            </div>
+            <div class="nav-right">
+                <a href="login.html" class="login-btn" data-i18n="nav-login">로그인</a>
+                <a href="signup.html" class="signup-btn" data-i18n="nav-signup">가입하기</a>
+                <div class="more-menu-btn" id="moreMenuBtn">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+                <div class="more-menu-dropdown" id="moreMenuDropdown">
+                    <div class="mega-menu-content">
+                        <!-- 1열: 기타 제품 -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-section-title">기타 제품</div>
+                            <a href="../index.html" class="mega-menu-item">
+                                <div class="mega-menu-item-icon"><i class="fas fa-closed-captioning"></i></div>
+                                <div class="mega-menu-item-text">
+                                    <div class="mega-menu-item-title">자막생성</div>
+                                    <div class="mega-menu-item-desc">AI 기반 실시간 번역</div>
+                                </div>
+                                <i class="fas fa-arrow-right mega-menu-arrow"></i>
+                            </a>
+                            <a href="#" class="mega-menu-item">
+                                <div class="mega-menu-item-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                                <div class="mega-menu-item-text">
+                                    <div class="mega-menu-item-title">강의 번역</div>
+                                    <div class="mega-menu-item-desc">라이브 번역 및 자막</div>
+                                </div>
+                                <i class="fas fa-arrow-right mega-menu-arrow"></i>
+                            </a>
+                        </div>
+                        <!-- 2열: 링크 목록 -->
+                        <div class="mega-menu-column mega-menu-links">
+                            <a href="pricing.html" class="mega-menu-link">
+                                <i class="fas fa-file-alt"></i>
+                                <span>가격</span>
+                            </a>
+                            <a href="#" class="mega-menu-link">
+                                <i class="fas fa-lock"></i>
+                                <span>보안</span>
+                            </a>
+                            <a href="#" class="mega-menu-link">
+                                <i class="fas fa-th-large"></i>
+                                <span>기능</span>
+                            </a>
+                            <a href="#" class="mega-menu-link">
+                                <i class="fas fa-tags"></i>
+                                <span>회사 소개</span>
+                            </a>
+                            <div class="mega-menu-divider" style="height: 1px; background: #e5e7eb; margin: 16px 0;"></div>
+                            <div class="mega-menu-link has-submenu" id="helpMenuBtn">
+                                <i class="fas fa-chevron-left"></i>
+                                <span>도움</span>
+                            </div>
+                            <div class="mega-menu-link has-submenu" id="languageMenuBtn">
+                                <i class="fas fa-chevron-left"></i>
+                                <span>언어</span>
+                            </div>
+                        </div>
+                        <!-- 도움 서브메뉴 -->
+                        <div class="mega-submenu" id="helpSubmenu">
+                            <a href="used.html" class="mega-submenu-item">
+                                <i class="fas fa-book"></i>
+                                <span>사용방법</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-question-circle"></i>
+                                <span>자주 묻는 질문</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-tools"></i>
+                                <span>도구</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-user-shield"></i>
+                                <span>법률 & 개인 정보 보호</span>
+                            </a>
+                            <a href="#" class="mega-submenu-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>문의</span>
+                            </a>
+                        </div>
+                        <!-- 언어 서브메뉴 -->
+                        <div class="mega-submenu" id="languageSubmenu">
+                            <div class="mega-submenu-item language-option" data-lang="ko">
+                                <span>한국어</span>
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="en">
+                                <span>English</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="ja">
+                                <span>日本語</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="zh">
+                                <span>中文</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                            <div class="mega-submenu-item language-option" data-lang="fr">
+                                <span>Français</span>
+                                <i class="fas fa-check" style="visibility: hidden;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <!-- 메인 콘텐츠 -->
     <div class="main-content">
@@ -25,15 +177,8 @@
                 </div>
             </div>
             <div class="edit-header">
-                <div class="language-tabs">
-                    <div class="lang-tab active" data-lang="ko">
-                        <span class="lang-flag">🇰🇷</span>
-                        <span>Korean</span>
-                    </div>
-                    <div class="lang-tab" data-lang="en">
-                        <span class="lang-flag">🇺🇸</span>
-                        <span>English</span>
-                    </div>
+                <div class="language-tabs" id="language-tabs">
+                    <!-- 언어 탭은 번역 설정에 따라 동적으로 생성됩니다 -->
                 </div>
             </div>
 
@@ -68,11 +213,34 @@
                 
                 <!-- 비디오 플레이어 (비디오가 있을 때 표시) -->
                 <div class="video-player-wrapper" id="video-player-wrapper" style="display: flex;">
-                    <video class="video-player" id="video-player" preload="metadata" controls>
+                    <video class="video-player" id="video-player" preload="metadata">
                         <source src="" type="video/mp4">
                     </video>
                     <div class="subtitle-overlay" id="subtitle-overlay">
                         <div class="subtitle-text" id="subtitle-text"></div>
+                    </div>
+                    <!-- 커스텀 비디오 컨트롤 바 -->
+                    <div class="custom-video-controls" id="custom-video-controls">
+                        <div class="video-controls-bar">
+                            <button class="control-btn play-pause-btn" id="play-pause-btn">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <div class="time-display">
+                                <span class="current-time" id="current-time">0:00:00</span>
+                                <span class="time-separator">/</span>
+                                <span class="total-time" id="total-time">0:00:00</span>
+                            </div>
+                            <button class="control-btn cc-btn" id="cc-btn" title="자막">
+                                <i class="fas fa-closed-captioning"></i>
+                            </button>
+                            <button class="control-btn volume-btn" id="volume-btn" title="볼륨">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <div class="playback-speed" id="playback-speed">1x</div>
+                            <button class="control-btn fullscreen-btn" id="fullscreen-btn" title="전체화면">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -120,10 +288,11 @@
         </div>
     </div>
 
-    <script src="../js/i18n.js" defer></script>
     <script src="../js/nav-bar.js" defer></script>
     <script src="../js/auth-state.js" defer></script>
     <script src="../js/edit.js" defer></script>
+    <script src="../js/more-menu.js" defer></script>
+    <script src="../js/language-selector.js" defer></script>
     <script>
         // 더보기 메뉴 토글
         document.addEventListener('DOMContentLoaded', function() {
@@ -133,6 +302,13 @@
             if (moreMenuBtn && moreMenuDropdown) {
                 moreMenuBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
+                    
+                    // 사용자 드롭다운 닫기
+                    const userDropdown = document.querySelector('.user-dropdown-menu');
+                    if (userDropdown) {
+                        userDropdown.style.display = 'none';
+                    }
+                    
                     moreMenuDropdown.classList.toggle('active');
                 });
                 
@@ -172,26 +348,159 @@
                 });
             });
             
-            // 현재 페이지에 따라 활성 탭 설정
-            const tabs = document.querySelectorAll('.service-tab');
-            const currentPath = window.location.pathname;
-            const currentPage = currentPath.split('/').pop() || 'index.html';
+        });
+        
+        // 서브메뉴 호버 기능
+        const helpMenuBtn = document.getElementById('helpMenuBtn');
+        const languageMenuBtn = document.getElementById('languageMenuBtn');
+        const helpSubmenu = document.getElementById('helpSubmenu');
+        const languageSubmenu = document.getElementById('languageSubmenu');
+        const megaMenuContent = document.querySelector('.mega-menu-content');
+        
+        // 서브메뉴 닫기 함수
+        function closeAllSubmenus() {
+            if (helpSubmenu) helpSubmenu.classList.remove('active');
+            if (languageSubmenu) languageSubmenu.classList.remove('active');
+            if (megaMenuContent) megaMenuContent.classList.remove('blurred');
+        }
+        
+        if (helpMenuBtn && helpSubmenu) {
+            let helpTimeout = null;
             
-            tabs.forEach(tab => {
-                const href = tab.getAttribute('href');
-                if (href) {
-                    const tabPath = href.split('/').pop() || 'index.html';
+            helpMenuBtn.addEventListener('mouseenter', () => {
+                if (helpTimeout) clearTimeout(helpTimeout);
+                // 언어 서브메뉴 닫기
+                if (languageSubmenu) {
+                    languageSubmenu.classList.remove('active');
+                }
+                // 도움 서브메뉴 열기
+                helpSubmenu.classList.add('active');
+                if (megaMenuContent) megaMenuContent.classList.add('blurred');
+            });
+            
+            helpMenuBtn.addEventListener('mouseleave', () => {
+                helpTimeout = setTimeout(() => {
+                    helpSubmenu.classList.remove('active');
+                    if (megaMenuContent && !languageSubmenu.classList.contains('active')) {
+                        megaMenuContent.classList.remove('blurred');
+                    }
+                }, 150);
+            });
+            
+            helpSubmenu.addEventListener('mouseenter', () => {
+                if (helpTimeout) clearTimeout(helpTimeout);
+            });
+            
+            helpSubmenu.addEventListener('mouseleave', () => {
+                helpSubmenu.classList.remove('active');
+                if (megaMenuContent && !languageSubmenu.classList.contains('active')) {
+                    megaMenuContent.classList.remove('blurred');
+                }
+            });
+        }
+        
+        if (languageMenuBtn && languageSubmenu) {
+            let languageTimeout = null;
+            
+            languageMenuBtn.addEventListener('mouseenter', () => {
+                if (languageTimeout) clearTimeout(languageTimeout);
+                // 도움 서브메뉴 닫기
+                if (helpSubmenu) {
+                    helpSubmenu.classList.remove('active');
+                }
+                // 언어 서브메뉴 열기
+                languageSubmenu.classList.add('active');
+                if (megaMenuContent) megaMenuContent.classList.add('blurred');
+            });
+            
+            languageMenuBtn.addEventListener('mouseleave', () => {
+                languageTimeout = setTimeout(() => {
+                    languageSubmenu.classList.remove('active');
+                    if (megaMenuContent && !helpSubmenu.classList.contains('active')) {
+                        megaMenuContent.classList.remove('blurred');
+                    }
+                }, 150);
+            });
+            
+            languageSubmenu.addEventListener('mouseenter', () => {
+                if (languageTimeout) clearTimeout(languageTimeout);
+            });
+            
+            languageSubmenu.addEventListener('mouseleave', () => {
+                languageSubmenu.classList.remove('active');
+                if (megaMenuContent && !helpSubmenu.classList.contains('active')) {
+                    megaMenuContent.classList.remove('blurred');
+                }
+            });
+            
+            // 언어 옵션 클릭 이벤트
+            const languageOptions = languageSubmenu.querySelectorAll('.language-option');
+            languageOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     
-                    if (tabPath === 'index.html' && (currentPage === 'index.html' || currentPage === 'edit.html')) {
-                        tab.classList.add('active');
-                    } else if (tabPath === 'storage.html' && currentPage === 'storage.html') {
-                        tab.classList.add('active');
+                    const selectedLang = this.getAttribute('data-lang');
+                    if (!selectedLang) return;
+                    
+                    // localStorage에 저장 (모든 페이지에 적용)
+                    localStorage.setItem('siteLanguage', selectedLang);
+                    
+                    // 모든 체크 아이콘 숨기기
+                    languageOptions.forEach(opt => {
+                        const checkIcon = opt.querySelector('.fa-check');
+                        if (checkIcon) {
+                            checkIcon.style.visibility = 'hidden';
+                        }
+                        opt.classList.remove('active');
+                    });
+                    
+                    // 선택된 언어에 체크 표시
+                    const checkIcon = this.querySelector('.fa-check');
+                    if (checkIcon) {
+                        checkIcon.style.visibility = 'visible';
+                    }
+                    this.classList.add('active');
+                    
+                    // i18n.js를 통한 언어 변경 (모든 페이지에 적용)
+                    if (window.i18n && typeof window.i18n.setLanguage === 'function') {
+                        window.i18n.setLanguage(selectedLang);
                     } else {
-                        tab.classList.remove('active');
+                        // i18n.js가 없으면 localStorage에 저장하고 페이지 새로고침
+                        localStorage.setItem('siteLanguage', selectedLang);
+                        window.location.reload();
+                    }
+                    
+                    // 언어 변경 이벤트 발생 (다른 컴포넌트 업데이트)
+                    const event = new CustomEvent('languageChanged', {
+                        detail: { language: selectedLang },
+                        bubbles: true
+                    });
+                    document.dispatchEvent(event);
+                    
+                    // HTML lang 속성 즉시 업데이트
+                    document.documentElement.setAttribute('lang', selectedLang);
+                });
+            });
+            
+            // 초기 언어 선택 상태 복원
+            const currentLang = localStorage.getItem('siteLanguage') || 'ko';
+            languageOptions.forEach(option => {
+                const lang = option.getAttribute('data-lang');
+                if (lang === currentLang) {
+                    const checkIcon = option.querySelector('.fa-check');
+                    if (checkIcon) {
+                        checkIcon.style.visibility = 'visible';
+                    }
+                    option.classList.add('active');
+                } else {
+                    const checkIcon = option.querySelector('.fa-check');
+                    if (checkIcon) {
+                        checkIcon.style.visibility = 'hidden';
                     }
                 }
             });
-        });
+        }
     </script>
 </body>
 </html>

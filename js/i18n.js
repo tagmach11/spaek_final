@@ -644,16 +644,34 @@
             return;
         }
         
+        // localStorage에 저장 (모든 페이지에 적용)
         localStorage.setItem('siteLanguage', lang);
+        
+        // HTML lang 속성 즉시 업데이트
+        document.documentElement.setAttribute('lang', lang);
+        
+        // 페이지 텍스트 즉시 업데이트
         updatePageLanguage();
         
-        // 언어 선택 UI 업데이트 (체크 표시)
-        document.querySelectorAll('#languageSubmenu .language-option').forEach(opt => {
+        // 언어 선택 UI 업데이트 (체크 표시) - 모든 언어 선택 메뉴에서
+        document.querySelectorAll('#languageSubmenu .language-option, .language-option').forEach(opt => {
             const check = opt.querySelector('.fa-check');
             if (check) {
                 check.style.visibility = opt.dataset.lang === lang ? 'visible' : 'hidden';
             }
+            if (opt.dataset.lang === lang) {
+                opt.classList.add('active');
+            } else {
+                opt.classList.remove('active');
+            }
         });
+        
+        // 언어 변경 이벤트 발생 (다른 컴포넌트 업데이트)
+        const event = new CustomEvent('languageChanged', {
+            detail: { language: lang },
+            bubbles: true
+        });
+        document.dispatchEvent(event);
     }
 
     // 초기화
