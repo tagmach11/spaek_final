@@ -67,7 +67,7 @@
         // DOM 요소 캐싱 (최적화)
         const DOMCache = {
             get videoPlayer() { return document.getElementById('video-player'); },
-            get dropZone() { return document.getElementById('video-drop-zone'); },
+            get loadingScreen() { return document.getElementById('video-loading-screen'); },
             get videoPlayerWrapper() { return document.getElementById('video-player-wrapper'); },
             get placeholder() { return document.getElementById('video-placeholder'); },
             get transcriptionList() { return document.getElementById('transcription-list'); },
@@ -83,14 +83,12 @@
 
         // 비디오 플레이어 표시/숨김 통합 함수 (최적화)
         function toggleVideoPlayerElements(showPlayer) {
-            const { dropZone, videoPlayerWrapper, placeholder, videoPlayer } = DOMCache;
+            const { loadingScreen, videoPlayerWrapper, placeholder, videoPlayer } = DOMCache;
             
             if (showPlayer) {
-                // 드롭존 확실히 숨기기
-                if (dropZone) {
-                    dropZone.style.display = 'none';
-                    dropZone.style.visibility = 'hidden';
-                    dropZone.style.opacity = '0';
+                // 로딩 화면 숨기기
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
                 }
                 // 플레이어 표시
                 if (videoPlayerWrapper) {
@@ -116,21 +114,21 @@
                     placeholder.style.display = 'none';
                     placeholder.style.visibility = 'hidden';
                 }
-                logger.log('비디오 플레이어 표시됨, 드롭존 숨김');
+                logger.log('비디오 플레이어 표시됨, 로딩 화면 숨김');
             } else {
                 if (placeholder) placeholder.style.display = 'flex';
-                if (dropZone) dropZone.style.display = 'none';
+                if (loadingScreen) loadingScreen.style.display = 'flex';
                 if (videoPlayerWrapper) videoPlayerWrapper.style.display = 'none';
                 if (videoPlayer) videoPlayer.style.display = 'none';
-                logger.log('비디오 플레이어 숨김');
+                logger.log('비디오 플레이어 숨김, 로딩 화면 표시');
             }
         }
 
-        // 드롭존 표시 함수
-        function showDropZone() {
-            const { dropZone, videoPlayerWrapper, placeholder } = DOMCache;
+        // 로딩 화면 표시 함수
+        function showLoadingScreen() {
+            const { loadingScreen, videoPlayerWrapper, placeholder } = DOMCache;
             if (placeholder) placeholder.style.display = 'none';
-            if (dropZone) dropZone.style.display = 'flex';
+            if (loadingScreen) loadingScreen.style.display = 'flex';
             if (videoPlayerWrapper) videoPlayerWrapper.style.display = 'none';
         }
 
@@ -353,7 +351,7 @@
             
             if (!currentVideo) {
                 logger.error('비디오 데이터가 없습니다.');
-                showDropZone();
+                showLoadingScreen();
                 return;
             }
             
@@ -450,7 +448,7 @@
             // 모든 시도 실패 시
             if (!videoLoaded || !videoSrc) {
                 logger.error('비디오를 로드할 수 없습니다.');
-                showDropZone();
+                showLoadingScreen();
                 return;
             }
             
@@ -1314,102 +1312,7 @@
             });
         }
         
-        // 드래그 앤 드롭 초기화 (최적화)
-        function initializeDragAndDrop() {
-            const dropZone = DOMCache.dropZone;
-            const fileInput = document.getElementById('video-file-input');
-            const videoPlayerWrapper = DOMCache.videoPlayerWrapper;
-            const videoPlayer = DOMCache.videoPlayer;
-            
-            if (!dropZone || !fileInput || !videoPlayer) return;
-            
-            let dragCounter = 0;
-            
-            // 드래그 이벤트 방지
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            // 드래그 오버
-            dropZone.addEventListener('dragenter', (e) => {
-                preventDefaults(e);
-                dragCounter++;
-                if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-                    dropZone.classList.add('drag-over');
-                }
-            });
-            
-            // 드래그 리브
-            dropZone.addEventListener('dragleave', (e) => {
-                preventDefaults(e);
-                dragCounter--;
-                if (dragCounter === 0) {
-                    dropZone.classList.remove('drag-over');
-                }
-            });
-            
-            // 드롭
-            dropZone.addEventListener('drop', (e) => {
-                preventDefaults(e);
-                dropZone.classList.remove('drag-over');
-                dragCounter = 0;
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleVideoFile(files[0]);
-                }
-            });
-            
-            // 파일 선택
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleVideoFile(e.target.files[0]);
-                }
-            });
-            
-            // 비디오 파일 처리
-            function handleVideoFile(file) {
-                // 파일 유효성 검사
-                if (!file.type.startsWith('video/')) {
-                    alert('영상 파일만 업로드 가능합니다.');
-                    return;
-                }
-                
-                if (file.size > 2 * 1024 * 1024 * 1024) {
-                    alert('파일 크기는 2GB를 초과할 수 없습니다.');
-                    return;
-                }
-                
-                // 비디오 URL 생성
-                const videoUrl = URL.createObjectURL(file);
-                
-                // 비디오 플레이어에 설정
-                videoPlayer.src = videoUrl;
-                videoPlayer.load();
-                
-                // 드롭존 숨기고 플레이어 표시
-                toggleVideoPlayerElements(true);
-                
-                // 비디오 메타데이터 로드
-                videoPlayer.addEventListener('loadedmetadata', () => {
-                    videoDuration = videoPlayer.duration;
-                    updateProgress();
-                    setTimeout(() => {
-                        initializeCustomControls();
-                    }, 100);
-                }, { once: true });
-                
-                // 비디오 로드 오류 처리
-                videoPlayer.addEventListener('error', () => {
-                    logger.error('비디오 로드 오류');
-                    showDropZone();
-                    alert('비디오를 로드할 수 없습니다. 다른 파일을 시도해주세요.');
-                }, { once: true });
-                
-                logger.log('비디오 파일 업로드 완료:', file.name);
-            }
-        }
+        // 드래그 앤 드롭 기능 제거됨 (로딩 화면으로 대체)
         
         // 제목 편집 모달 기능
         function initializeTitleEditModal() {
@@ -1652,13 +1555,13 @@
 
         // 초기화 (최적화)
         initializeRemainingTime();
-        initializeDragAndDrop();
+        // 드래그 앤 드롭 기능 제거됨
         initializeTitleEditModal();
         
         if (videoId) {
             loadVideoData();
         } else {
             // videoId가 없으면 드롭존 표시
-            showDropZone();
+            showLoadingScreen();
         }
     
