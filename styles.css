@@ -32,7 +32,7 @@ body {
     overflow-x: hidden;
     min-height: 100vh;
     position: relative;
-    padding-top: 60px; /* 네비게이션 바 높이만큼 패딩 추가 */
+    padding-top: 57px; /* 네비게이션 바 높이만큼 패딩 추가 */
 }
 
 /* 배경 효과 - 제거됨 */
@@ -71,7 +71,7 @@ body {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(30px);
     border-bottom: 1px solid #E5E7EB;
-    padding: 8px 0;
+    padding: 5px 0;
 }
 
 .nav-content {
@@ -1798,7 +1798,7 @@ body {
     }
     
     .glass-nav {
-        padding: 10px 0;
+        padding: 6px 0;
     }
     
     .nav-content {
