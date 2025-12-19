@@ -185,12 +185,19 @@
         const currentPath = window.location.pathname;
         const currentPage = currentPath.split('/').pop() || 'index.html';
         
+        // storage.html에서는 아무 탭도 활성화하지 않음
+        if (currentPage === 'storage.html') {
+            document.querySelectorAll('.service-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            return;
+        }
+        
         document.querySelectorAll('.service-tab').forEach(tab => {
             const tabPage = tab.getAttribute('data-page');
             if (tabPage === currentPage || 
                 (currentPage === 'index.html' && tabPage === 'index.html') ||
                 (currentPage === 'edit.html' && tabPage === 'index.html') ||
-                (currentPage === 'storage.html' && tabPage === 'index.html') ||
                 (currentPage === 'guide.html' && tabPage === 'used.html') ||
                 (currentPage === 'pricing.html' && tabPage === 'pricing.html')) {
                 tab.classList.add('active');
