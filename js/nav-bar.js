@@ -4,8 +4,8 @@
     const isInHtmlFolder = window.location.pathname.includes('/html/');
     const assetPath = isInHtmlFolder ? '../' : '';  // 자산(이미지 등) 경로
     const htmlPath = isInHtmlFolder ? '' : 'html/';  // html 파일 경로
-    // ax2_home 경로 - 현재 위치와 관계없이 루트 기준으로 설정
-    const ax2HomePath = isInHtmlFolder ? '../ax2_home/' : 'ax2_home/';
+    // speak_home 경로 - 현재 위치와 관계없이 루트 기준으로 설정
+    const speakHomePath = isInHtmlFolder ? '../speak_home/' : 'speak_home/';
 
     // 네비게이션 바 HTML 생성
     function createNavBar() {
@@ -109,7 +109,7 @@
                                 <i class="fas fa-th-large"></i>
                                 <span>기능</span>
                             </a>
-                            <a href="${ax2HomePath}company.html" class="mega-menu-link" target="_blank">
+                            <a href="${speakHomePath}spaekmain.html" class="mega-menu-link" target="_blank">
                                 <i class="fas fa-tags"></i>
                                 <span>회사 소개</span>
                             </a>
